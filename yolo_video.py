@@ -1,3 +1,4 @@
+import os
 import sys
 import argparse
 from yolo import YOLO, detect_video
@@ -67,6 +68,9 @@ if __name__ == '__main__':
 
     FLAGS = parser.parse_args()
     print(vars(FLAGS))
+
+    if FLAGS.gpu_num < 1:
+        os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
     if FLAGS.image:
         """
