@@ -8,6 +8,7 @@ import os
 from timeit import default_timer as timer
 
 import numpy as np
+
 from keras import backend as K
 from keras.models import load_model
 from keras.layers import Input
@@ -15,7 +16,6 @@ from PIL import Image, ImageFont, ImageDraw
 
 from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
 from yolo3.utils import letterbox_image
-import os
 from keras.utils import multi_gpu_model
 
 class YOLO(object):
@@ -195,6 +195,8 @@ def detect_video(yolo, video_path, output_path=""):
         # out = cv2.VideoWriter(output_path, video_FourCC, video_fps, video_size)
     accum_time = 0
     curr_fps = 0
+    accum_time2 = 0
+
     fps = "FPS: ??"
     prev_time = timer()
     count = 0
@@ -206,20 +208,28 @@ def detect_video(yolo, video_path, output_path=""):
 
         # print('frame: ', frame)
         image = Image.fromarray(frame)
-        image = yolo.detect_image(image)
-        result = np.asarray(image)
+
         curr_time = timer()
+        image = yolo.detect_image(image)
+        exec_time2 = timer() - curr_time
+
+        result = np.asarray(image)
+
+
         exec_time = curr_time - prev_time
         prev_time = curr_time
+
+
         accum_time = accum_time + exec_time
+        accum_time2 = accum_time2 + exec_time2
         curr_fps = curr_fps + 1
         if accum_time > 1:
-            accum_time = accum_time - 1
-            # fps = "FPS: " + str(curr_fps)
-            fps = ''
+            fps = "FPS: " + str(round(curr_fps/accum_time,3))+ '/ avg time:' + str(int(round(1000*accum_time2/curr_fps,0))) + ' ms'
+            accum_time2 = 0
+            accum_time = 0
             curr_fps = 0
         cv2.putText(result, text=fps, org=(3, 15), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                    fontScale=0.50, color=(255, 0, 0), thickness=2)
+                    fontScale=0.5, color=(255, 0, 0), thickness=2)
         # cv2.putText(result, org=(3, 15), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
         #             fontScale=0.50, color=(255, 0, 0), thickness=2)
         cv2.namedWindow("result", cv2.WINDOW_NORMAL)
