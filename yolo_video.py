@@ -45,8 +45,8 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        '--gpu_num', type=int,
-        help='Number of GPU to use, default ' + str(YOLO.get_defaults("gpu_num"))
+        '--gpu_num', default=1, type=int,
+        help='Number of GPU to use, default 1 '
     )
 
     parser.add_argument(
