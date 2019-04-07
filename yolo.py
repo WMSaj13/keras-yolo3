@@ -185,14 +185,16 @@ def detect_video(yolo, video_path, output_path=""):
 
     if not vid.isOpened():
         raise IOError("Couldn't open webcam or video")
-    video_FourCC    = int(vid.get(cv2.CAP_PROP_FOURCC))
-    video_fps       = vid.get(cv2.CAP_PROP_FPS)
+    video_FourCC    = cv2.VideoWriter_fourcc(*'MJPG')
+    video_fps       = vid.get(cv2.CAP_PROP_FPS) or 20
     video_size      = (int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)),
                         int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     isOutput = True if output_path != "" else False
     if isOutput:
-        print("!!! TYPE:", type(output_path), type(video_FourCC), type(video_fps), type(video_size))
-        # out = cv2.VideoWriter(output_path, video_FourCC, video_fps, video_size)
+        format = str(video_path).split('.')[-1] or 'avi'
+        output_file = os.path.join(output_path,'yolo3_output.avi')
+        print("!!! TYPE:", type(output_file), type(video_fps), type(video_size))
+        out = cv2.VideoWriter(output_file, video_FourCC, video_fps, video_size)
     accum_time = 0
     curr_fps = 0
     accum_time2 = 0
@@ -238,10 +240,10 @@ def detect_video(yolo, video_path, output_path=""):
         count += 1
         print('count: ', count)
         # cv2.imwrite("test_data/output/result_%d.jpg" % count, result)
-        cv2.imwrite(out_image_folder+"/result_%d.jpg" % count, result)
+        #cv2.imwrite(out_image_folder+"/result_%d.jpg" % count, result)
 
-        # if isOutput:
-        #     out.write(result)
+        if isOutput:
+            out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
