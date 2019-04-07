@@ -176,7 +176,7 @@ class YOLO(object):
 
 def detect_video(yolo, video_path, output_path=""):
     import cv2
-    vid = cv2.VideoCapture(video_path)
+    vid = cv2.VideoCapture(video_path if video_path not in ("0","1") else int(video_path))
     print('vid: ', vid)
     print('output_path: ', output_path)
 
